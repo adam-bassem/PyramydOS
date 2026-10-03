@@ -8,7 +8,6 @@
 #	include	<arch/x86_64/acpi/acpi.hpp>
 #	include <arch/x86_64/io.hpp>
 #	include <arch/x86_64/cpuid.hpp>
-#	include <arch/x86_64/apic/apic.hpp>
 #endif
 
 #include <console/console.hpp>
@@ -123,11 +122,6 @@ extern "C" void kmain() {
 
 	timers::init();
 	console::kprintf("Timers Initialised...\r\n");
-
-#if defined (__x86_64__)
-	arch::x86_64::apic::init();
-	console::kprintf("APIC Initialised...\r\n");
-#endif
 
     hcf();
 }
