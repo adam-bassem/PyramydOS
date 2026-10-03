@@ -17,9 +17,10 @@ override IMAGE_NAME := pyramydos-$(ARCH)
 override TOOLCHAIN_PREFIX :=
 ifeq ($(ARCH),x86_64)
     override QEMU_MACHINE_FLAGS := \
-        -M q35
+        -M q35,sata=off -cpu max -smp 4 -device ahci,id=ahci0
     override QEMU_DISK_FLAGS := \
-        -hda $(IMAGE_NAME).hdd
+        -drive if=none,id=hd0,format=raw,file=$(IMAGE_NAME).hdd \
+        -device ide-hd,drive=hd0,bus=ahci0.0
     override LIMINE_EFI := BOOTX64.EFI BOOTIA32.EFI
 else
     ifeq ($(ARCH),aarch64)

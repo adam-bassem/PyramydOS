@@ -8,6 +8,7 @@
 #	include	<arch/x86_64/acpi/acpi.hpp>
 #	include <arch/x86_64/io.hpp>
 #	include <arch/x86_64/cpuid.hpp>
+#	include <arch/x86_64/apic/apic.hpp>
 #endif
 
 #include <console/console.hpp>
@@ -115,13 +116,18 @@ extern "C" void kmain() {
 
 	console::kprintf("Allocator Initialised...\r\n");
 
-#if defined (__x86_64)
+#if defined (__x86_64__)
 	arch::x86_64::acpi::init();
 	console::kprintf("ACPI Initialised...\r\n");
 #endif
 
 	timers::init();
 	console::kprintf("Timers Initialised...\r\n");
+
+#if defined (__x86_64__)
+	arch::x86_64::apic::init();
+	console::kprintf("APIC Initialised...\r\n");
+#endif
 
     hcf();
 }
