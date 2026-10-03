@@ -84,16 +84,22 @@ void console::writec(const char c)
 
 int console::kprintf(const char* __restrict fmt, ...)
 {
-	uint64_t total_microsecs = timers::total_us_elapsed();
-	uint64_t secs = total_microsecs / 1000000;
-	uint64_t microsecs = total_microsecs % 1000000;
-	printf("[%llu.%06llu] ", secs, microsecs);
+	print_timestamp();
 	va_list args;
 	va_start(args, fmt);
 	int ret = vprintf(fmt, args);
 	va_end(args);
+	writes(ANSI_RESET "\r\n");
 
 	return ret;
+}
+
+void console::print_timestamp()
+{
+	uint64_t total_microsecs = timers::total_us_elapsed();
+	uint64_t secs = total_microsecs / 1000000;
+	uint64_t microsecs = total_microsecs % 1000000;
+	printf("[%llu.%06llu] ", secs, microsecs);	
 }
 
 void __putc__(char c)

@@ -43,30 +43,20 @@ namespace
 
 extern "C" void high_level_exception_handler(int_context_t* ctx)
 {
-	console::kprintf("*******************************\r\n");
-	console::kprintf("***    EXCEPTION OCCURED    ***\r\n");
-	console::kprintf("*******************************\r\n");
+	console::kprintf("*******************************");
+	console::kprintf("***    EXCEPTION OCCURED    ***");
+	console::kprintf("*******************************");
 
-	console::kprintf("Exception Details:\r\n");
-	console::kprintf(
-		"Exception: %s\r\n"
-		"rax=%016llx rbx=%016llx rdx=%016llx rcx=%016llx\r\n"
-		"rbp=%016llx rdi=%016llx rsi=%016llx r8 =%016llx\r\n"
-		"r9 =%016llx r10=%016llx r11=%016llx r12=%016llx\r\n"
-		"r13=%016llx r14=%016llx r15=%016llx\r\n"
-		"rip=%016llx cs =%016llx rfl=%016llx rsp=%016llx\r\n"
-		"ss=%016llx\r\n"
-		"error code = %llu (%llx)\r\n"
-		"cr0=%016llx cr2=%016llx cr3=%016llx cr3=%016llx\r\n",
-		exception_names[ctx->vector],
-		ctx->rax, ctx->rbx, ctx->rdx, ctx->rcx,
-		ctx->rbp, ctx->rdi, ctx->rsi, ctx->r8,
-		ctx->r9, ctx->r10, ctx->r11, ctx->r12,
-		ctx->r13, ctx->r14, ctx->r15,
-		ctx->rip, ctx->cs, ctx->rflags, ctx->rsp,
-		ctx->ss, ctx->error_code,
-		ctx->cr0, ctx->cr2, ctx->cr3, ctx->cr4
-	);
+	console::kprintf("Exception Details:");
+	console::kprintf("Exception: %s", exception_names[ctx->vector]);
+	console::kprintf("rax=%016llx rbx=%016llx rdx=%016llx rcx=%016llx", ctx->rax, ctx->rbx, ctx->rdx, ctx->rcx);
+	console::kprintf("rbp=%016llx rdi=%016llx rsi=%016llx r8 =%016llx", ctx->rbp, ctx->rdi, ctx->rsi, ctx->r8);
+	console::kprintf("r9 =%016llx r10=%016llx r11=%016llx r12=%016llx", ctx->r9, ctx->r10, ctx->r11, ctx->r12);
+	console::kprintf("r13=%016llx r14=%016llx r15=%016llx", ctx->r13, ctx->r14, ctx->r15);
+	console::kprintf("rip=%016llx cs =%016llx rfl=%016llx rsp=%016llx", ctx->rip, ctx->cs, ctx->rflags, ctx->rsp);
+	console::kprintf("ss=%016llx", ctx->ss);
+	console::kprintf("error code = %llu (%llx)", ctx->error_code);
+	console::kprintf("cr0=%016llx cr2=%016llx cr3=%016llx cr3=%016llx", ctx->cr0, ctx->cr2, ctx->cr3, ctx->cr4);
 	
 	hcf_g();
 }

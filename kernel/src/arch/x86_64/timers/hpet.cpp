@@ -65,7 +65,8 @@ void arch::x86_64::timers::hpet::init()
 	hpet_table* hpettable = reinterpret_cast<hpet_table*>(arch::x86_64::acpi::get_table("HPET"));
 	if (!hpettable)
 	{
-		console::kprintf("\e[1;31mHPET table not present\e[0m\r\nHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "HPET table not present");
+		console::kprintf("Halting...");
 		hcf();
 	}
 	uintptr_t phys_addr = hpettable->address.address;
@@ -79,7 +80,8 @@ void arch::x86_64::timers::hpet::init()
 
 	if (!hpet_reg)
 	{
-		console::kprintf("\e[1;31mFailed to allocate memory for HPET\e[0m\r\nHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "Failed to allocate memory for HPET");
+		console::kprintf("Halting...");
 		hcf();
 	}
 

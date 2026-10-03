@@ -45,7 +45,8 @@ void arch::x86_64::acpi::init()
 {
 	if (!rsdp_request.response || !rsdp_request.response->address)
 	{
-		console::kprintf("\e[1;31mRSDP address is \e[1;35mNULL\r\n\e[0mHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "RSDP address is " ANSI_BOLD ANSI_PURPLE "NULL");
+		console::kprintf("Halting...");
 		hcf();
 	}
 	rsdp = reinterpret_cast<rsdp_table*>(rsdp_request.response->address);
@@ -57,27 +58,29 @@ void arch::x86_64::acpi::init()
 	}
 	if (sum != 0)
 	{
-		console::kprintf("\e[1;31mRSDP checksum is INVALID\r\n\e[0mHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "RSDP checksum is INVALID");
+		console::kprintf("Halting...");
 		hcf();
 	}
-	console::kprintf("RSDP checksum valid\r\n");
+	console::kprintf("RSDP checksum valid");
 
-	console::kprintf("Found RSDP table...\r\n");
-	console::kprintf("Table signature: \e[1;36m\"%.8s\"\e[0m\r\n", rsdp->sig);
-	console::kprintf("Checksum: %u\r\n", rsdp->checksum);
-	console::kprintf("OEM ID: \e[1;36m\"%.6s\"\e[0m\r\n", rsdp->oem_id);
-	console::kprintf("Revision: %u\r\n", rsdp->revision);
-	console::kprintf("RSDT address: 0x%x\r\n", rsdp->rsdt_addr);
+	console::kprintf("Found RSDP table...");
+	console::kprintf("Table signature: " ANSI_CYAN "\"%.8s\"", rsdp->sig);
+	console::kprintf("Checksum: %u", rsdp->checksum);
+	console::kprintf("OEM ID: " ANSI_CYAN "\"%.6s\"", rsdp->oem_id);
+	console::kprintf("Revision: %u", rsdp->revision);
+	console::kprintf("RSDT address: 0x%x", rsdp->rsdt_addr);
 
 	if (rsdp->revision < 2)
 	{
-		console::kprintf("revision < 2, unsupported version, halting...\r\n");
+		console::kprintf("Revision < 2, unsupported version");
+		console::kprintf("Halting...");
 		hcf();
 	}
 
-	console::kprintf("RSDP version 2.0+\r\n");
-	console::kprintf("XSDT address: 0x%llx\r\n", rsdp->xsdt_addr);
-	console::kprintf("Extended checksum: %u\r\n", rsdp->extended_checksum);
+	console::kprintf("RSDP version 2.0+");
+	console::kprintf("XSDT address: 0x%llx", rsdp->xsdt_addr);
+	console::kprintf("Extended checksum: %u", rsdp->extended_checksum);
 
 	sum = 0;
 	for (uint32_t i = 0; i < rsdp->length; i++)
@@ -86,14 +89,16 @@ void arch::x86_64::acpi::init()
 	}
 	if (sum != 0)
 	{
-		console::kprintf("\e[1;31mRSDP 2.0 checksum is INVALID\r\n\e[0mHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "RSDP 2.0 checksum is INVALID");
+		console::kprintf("Halting...");
 		hcf();
 	}
-	console::kprintf("RSDP 2.0 checksum valid\r\n");
+	console::kprintf("RSDP 2.0 checksum valid");
 
 	if (!rsdp->xsdt_addr)
 	{
-		console::kprintf("\e[1;31mXSDT address is \e[1;35mNULL\r\n\e[0mHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "XSDT address is " ANSI_BOLD ANSI_PURPLE "NULL");
+		console::kprintf("Halting...");
 		hcf();
 	}
 
@@ -101,10 +106,11 @@ void arch::x86_64::acpi::init()
 
 	if (!check_checksum(xsdt))
 	{
-		console::kprintf("\e[1;31mXSDT checksum is INVALID\r\n\e[0mHalting...\r\n");
+		console::kprintf(ANSI_BOLD ANSI_RED "XSDT checksum is INVALID");
+		console::kprintf("Halting...");
 		hcf();
 	}
-	console::kprintf("XSDT checksum valid\r\n");
+	console::kprintf("XSDT checksum valid");
 
 	root_table.sig[0] = 'R'; root_table.sig[1] = 'S';
 	root_table.sig[2] = 'D'; root_table.sig[3] = 'P';
@@ -129,14 +135,14 @@ void arch::x86_64::acpi::init()
 
 		if (!check_checksum(&table->header))
 		{
-			console::kprintf("\e[1;31mACPI table %.4s checksum is INVALID\r\n\e[0m", table->header.signature);
+			console::kprintf(ANSI_BOLD ANSI_RED "ACPI table %.4s checksum is INVALID", table->header.signature);
 			continue;
 		}
 
 		acpi_table_entry* entry = reinterpret_cast<acpi_table_entry*>(alloc::malloc(sizeof(acpi_table_entry)));
 		if (!entry)
 		{
-			console::kprintf("\e[1;31mOut of memory while enumerating ACPI tables\r\n\e[0m");
+			console::kprintf(ANSI_BOLD ANSI_RED "Out of memory while enumerating ACPI tables");
 			return;
 		}
 		entry->sig[0] = table->header.signature[0];
@@ -149,7 +155,7 @@ void arch::x86_64::acpi::init()
 		last->next = entry;
 		last = entry;
 
-		console::kprintf("Discovered table: \e[1;36m%.4s\t\e[1;35m%.6s\t\e[1;32m0x%p\r\n\e[0m", table->header.signature, table->header.oem_id, table);
+		console::kprintf("Discovered table: " ANSI_CYAN "%.4s\t" ANSI_BOLD ANSI_PURPLE "%.6s\t" ANSI_BOLD ANSI_GREEN "0x%p", table->header.signature, table->header.oem_id, table);
 	}
 }
 
