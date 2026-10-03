@@ -9,6 +9,7 @@
 #	include <arch/x86_64/io.hpp>
 #	include <arch/x86_64/cpuid.hpp>
 #	include <arch/x86_64/apic/apic.hpp>
+#	include <arch/x86_64/apic/ioapic.hpp>
 #endif
 
 #include <console/console.hpp>
@@ -128,6 +129,9 @@ extern "C" void kmain() {
 #if defined (__x86_64__)
 	arch::x86_64::apic::init();
 	console::kprintf("APIC Initialised...");
+
+	arch::x86_64::ioapic::init();
+	console::kprintf("I/O APIC Initialised...");
 #endif
 
     hcf();
