@@ -10,11 +10,14 @@
 #	include <arch/x86_64/cpuid.hpp>
 #	include <arch/x86_64/apic/apic.hpp>
 #	include <arch/x86_64/apic/ioapic.hpp>
+#	include <arch/x86_64/apic/lapic.hpp>
+#	include <arch/x86_64/irq/irq.hpp>
 #endif
 
 #include <console/console.hpp>
 #include <allocator/allocator.hpp>
 #include <timers/timers.hpp>
+#include <interrupts/ints.hpp>
 
 extern "C" void kmain() {
     pre_kernel();
@@ -35,9 +38,15 @@ extern "C" void kmain() {
 	console::init();
 	console::swap_ctx(0);
 
-	console::kprintf("***************************");
-	console::kprintf("***    PyramydKernel    ***");
-	console::kprintf("***************************");
+	console::kprintf_nv("┌────────────────────────────────────────────────────────────────────────┐");
+	console::kprintf_nv("│ ____                                      _ _  __                    _ │");
+	console::kprintf_nv("│|  _ \\ _   _ _ __ __ _ _ __ ___  _   _  __| | |/ /___ _ __ _ __   ___| |│");
+	console::kprintf_nv("│| |_) | | | | '__/ _` | '_ ` _ \\| | | |/ _` | ' // _ \\ '__| '_ \\ / _ \\ |│");
+	console::kprintf_nv("│|  __/| |_| | | | (_| | | | | | | |_| | (_| | . \\  __/ |  | | | |  __/ |│");
+	console::kprintf_nv("│|_|    \\__, |_|  \\__,_|_| |_| |_|\\__, |\\__,_|_|\\_\\___|_|  |_| |_|\\___|_|│");
+	console::kprintf_nv("│       |___/                     |___/                                  │");
+	console::kprintf_nv("└────────────────────────────────────────────────────────────────────────┘");
+	console::kprintf("Copyright © 2026 Adam Bassem. All rights reserved.");
 
 #if defined(__x86_64__)
 	// RAM info
@@ -126,13 +135,27 @@ extern "C" void kmain() {
 	timers::init();
 	console::kprintf("Timers Initialised...");
 
+	constexpr uint64_t test_duration_timer = 3;
+	uint64_t total_seconds_uptime_begin = timers::total_elapsed();
+
+	timers::sleep(test_duration_timer);
+	
+	uint64_t total_seconds_uptime_end = timers::total_elapsed();
+
+	if ((total_seconds_uptime_end - total_seconds_uptime_begin) < test_duration_timer)
+	{
+		console::kprintf(ANSI_BOLD ANSI_RED "Timer misfunctioning");
+		console::kprintf("Halting...");
+		hcf();
+	}
+
 #if defined (__x86_64__)
 	arch::x86_64::apic::init();
 	console::kprintf("APIC Initialised...");
-
-	arch::x86_64::ioapic::init();
-	console::kprintf("I/O APIC Initialised...");
 #endif
+
+	interrupts::enable_all();
+	console::kprintf("Enabled all interrupts...");
 
     hcf();
 }

@@ -35,6 +35,7 @@ namespace console
 	void swap_ctx(size_t index);
 
 	int kprintf(const char* __restrict fmt, ...);
+	int kprintf_nv(const char* __restrict fmt, ...);
 	void print_timestamp();
 }
 

@@ -6,6 +6,7 @@
 namespace
 {
 	bool int_set[NUM_INTS] = { false };
+	bool int_alloc[NUM_INTS] = { false };
 	arch::x86_64::idt::idt_entry idt_entries[NUM_INTS] = { 0 };
 
 	const char* exception_names[] =
@@ -131,4 +132,23 @@ void arch::x86_64::idt::set_handler(void* handler, uint8_t vector, uint8_t flags
 		int_set[vector] = false;
 		idt_entries[vector] = { 0 };
 	}
+}
+
+uint8_t arch::x86_64::idt::allocate_entry()
+{
+	for (int i = 0x20; i < 0xFF; i++)
+	{
+		if (!int_alloc[i])
+		{
+			int_alloc[i] = true;
+			return static_cast<uint8_t>(i);
+		}
+	}
+
+	return 0;
+}
+
+void arch::x86_64::idt::free_entry(uint8_t entry)
+{
+	int_alloc[entry] = false;
 }

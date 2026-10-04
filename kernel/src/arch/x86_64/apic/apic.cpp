@@ -1,10 +1,12 @@
 #include "apic.hpp"
 #include "ioapic.hpp"
+#include "lapic.hpp"
 #include <arch/x86_64/acpi/acpi.hpp>
 #include <arch/x86_64/cpuid.hpp>
 #include <console/console.hpp>
 #include <utils.hpp>
 #include <arch/x86_64/io.hpp>
+#include <arch/x86_64/mm/vmm.hpp>
 
 #define ENTRY_TYPE_PROCESSOR_LAPIC		0
 #define ENTRY_TYPE_IOAPIC				1
@@ -96,8 +98,6 @@ struct [[gnu::packed]] madt_entry
 	};
 };
 
-static_assert(offsetof(madt_entry, ioapic.ioapic_address) == 4);
-
 struct [[gnu::packed]] __madt_table__
 {
 	acpi_sdt_header header;
@@ -105,6 +105,9 @@ struct [[gnu::packed]] __madt_table__
 	uint32_t lapic_address;
 	uint32_t flags;
 } *madt;
+
+uint32_t lapic_bsp;
+void* lapic_address;
 
 void arch::x86_64::apic::init()
 {
@@ -128,6 +131,10 @@ void arch::x86_64::apic::init()
 		hcf();
 	}
 	console::kprintf("Acquired MADT table from ACPI");
+
+	lapic_bsp = mp_request.response->bsp_lapic_id;
+	console::kprintf("Acquired BSP LAPIC ID: 0x%x", lapic_bsp);
+	lapic_address = reinterpret_cast<void*>(madt->lapic_address);
 
 	uint64_t cursor = reinterpret_cast<uint64_t>(reinterpret_cast<uint64_t>(madt) + sizeof(__madt_table__));
 	uint64_t end = reinterpret_cast<uint64_t>(reinterpret_cast<uint64_t>(madt) + madt->header.length);
@@ -192,6 +199,7 @@ void arch::x86_64::apic::init()
 			{
 				console::kprintf("Found Local APIC Address Override entry:");
 				console::kprintf(ANSI_GREEN "\tLAPIC Address:" ANSI_CYAN " 0x%p", entry->lapic_address_override.lapic_address);
+				lapic_address = reinterpret_cast<void*>(entry->lapic_address_override.lapic_address);
 			
 				break;
 			}
@@ -207,4 +215,14 @@ void arch::x86_64::apic::init()
 
 		cursor += entry->record_length;
 	}
+
+	void* lapic_addr_virt = arch::x86_64::vmm::alloc_pages(1);
+	arch::x86_64::vmm::mmap(lapic_address, lapic_addr_virt, PTE_PRESENT | PTE_WRITABLE, 1);
+
+	arch::x86_64::lapic::lapic_bsp.init(lapic_addr_virt);
+	arch::x86_64::lapic::lapic_bsp.enable();
+	console::kprintf("Initialised Local APIC");
+
+	arch::x86_64::ioapic::init();
+	console::kprintf("I/O APIC Initialised...");
 }

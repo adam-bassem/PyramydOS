@@ -9,6 +9,8 @@
 #define IOAPIC_ARB	0x02
 #define IOAPIC_REDTBL(n) (0x10 + 2 * n)
 
+extern uint32_t lapic_bsp;
+
 struct gsi2irq_mapping
 {
     uint8_t irq_src;
@@ -121,28 +123,19 @@ namespace
 
 void arch::x86_64::ioapic::init()
 {
-	console::kprintf("Checking all known I/O APICs");
 	int i = 0;
 	ioapic_entry* entry = first_ioapic;
 	
 	while (entry)
 	{
-		console::kprintf("Parsing I/O APIC #%d...", i);
 		void* virtPage = arch::x86_64::vmm::alloc_pages(1);
 		arch::x86_64::vmm::mmap(entry->base, virtPage, PTE_PRESENT | PTE_WRITABLE, 1);
 		entry->base = virtPage;
-
-		console::kprintf("IOAPIC_VER = 0x%x", read_ioapic_reg(entry, IOAPIC_VER));
-		console::kprintf("IOAPIC_ID = 0x%x", read_ioapic_reg(entry, IOAPIC_ID));
 
 		entry->id = (read_ioapic_reg(entry, IOAPIC_ID) >> 24)  & 0xF0;
 		entry->version = (uint8_t)read_ioapic_reg(entry, IOAPIC_VER);
 		entry->max_redir_entry = (uint8_t)((read_ioapic_reg(entry, IOAPIC_VER) >> 16) + 1);
 
-		console::kprintf("I/O APIC #%d (ID#%u):", i, entry->id);
-		console::kprintf("\tVersion -> %u", entry->version);
-		console::kprintf("\tRedirection Entries Count -> %u", entry->max_redir_entry);
-	
 		entry = entry->next;
 		i++;
 	}
@@ -150,8 +143,6 @@ void arch::x86_64::ioapic::init()
 
 void arch::x86_64::ioapic::add_ioapic(void* address, uint32_t gsi_base)
 {
-    console::kprintf("Added I/O APIC, address = 0x%p, gsi_base=%u", address, gsi_base);
-
 	ioapic_entry* last = last_ioapic();
 	if (!last)
 	{
@@ -183,8 +174,6 @@ skip:
 
 void arch::x86_64::ioapic::register_iso(uint8_t bus_src, uint8_t irq_src, uint32_t gsi)
 {
-    console::kprintf("Registered IRQ(%u)->GSI(%u) mapping", irq_src, gsi);
-
     gsi2irq_mapping* last = last_gsi2irq_mapping();
     if (!last)
     {
@@ -212,4 +201,54 @@ skip:
     last->irq_src = irq_src;
     last->gsi = gsi;
     last->next = nullptr;
+}
+
+uint32_t arch::x86_64::ioapic::get_gsi_for_irq(uint32_t irq)
+{
+	gsi2irq_mapping* mapping = first_gsi2irq_mapping;
+	while (mapping)
+	{
+		if (mapping->irq_src == irq)
+		{
+			return mapping->gsi;
+		}
+		mapping = mapping->next;
+	}
+	return irq;
+}
+
+void arch::x86_64::ioapic::set_redir_entry(uint32_t gsi, uint8_t vector, bool mask)
+{
+	redirection_entry entry;
+
+	ioapic_entry* ioapic = first_ioapic;
+	while (ioapic)
+	{
+		if ((ioapic->gsi_base < gsi) && (ioapic->gsi_base + ioapic->max_redir_entry > gsi))
+		{
+			entry.lowerDword = read_ioapic_reg(ioapic, IOAPIC_REDTBL(gsi - ioapic->gsi_base));
+			entry.upperDword = read_ioapic_reg(ioapic, IOAPIC_REDTBL(gsi - ioapic->gsi_base) + 1);
+			goto success;
+		}
+		
+		ioapic = ioapic->next;
+	}
+	console::kprintf(ANSI_BOLD ANSI_RED "Failed to set redirection entry for GSI=%u...");
+	console::kprintf("Halting...");
+	hcf();
+
+success:
+	entry.vector = vector;
+	entry.delvMode = 0;
+	entry.destMode = 0;
+	entry.delvStatus = 0;
+	entry.pinPolarity = 0;
+	entry.remoteIRR = 0;
+	entry.triggerMode = 0;
+	entry.mask = mask;
+	entry.reserved = 0;
+	entry.destination = lapic_bsp;
+
+	write_ioapic_reg(ioapic, IOAPIC_REDTBL(gsi - ioapic->gsi_base), entry.lowerDword);
+	write_ioapic_reg(ioapic, IOAPIC_REDTBL(gsi - ioapic->gsi_base) + 1, entry.upperDword);
 }

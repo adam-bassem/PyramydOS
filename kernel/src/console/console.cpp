@@ -92,6 +92,19 @@ int console::kprintf(const char* __restrict fmt, ...)
 	writes(ANSI_RESET "\r\n");
 
 	return ret;
+	return 0;
+}
+
+int console::kprintf_nv(const char* __restrict fmt, ...)
+{
+	print_timestamp();
+	va_list args;
+	va_start(args, fmt);
+	int ret = vprintf(fmt, args);
+	va_end(args);
+	writes(ANSI_RESET "\r\n");
+
+	return ret;
 }
 
 void console::print_timestamp()
