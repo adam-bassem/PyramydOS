@@ -6,11 +6,13 @@
 
 // =================
 
+#if defined(__x86_64__)
 uintptr_t phys_to_virt(uintptr_t phys);
 void* phys_to_virt(void* phys);
 
 uintptr_t virt_to_phys(uintptr_t virt);
 void* virt_to_phys(void* virt);
+#endif
 
 // =================
 
@@ -23,7 +25,11 @@ void hcf_g();
 extern volatile struct limine_memmap_request memmap_request;
 extern volatile struct limine_hhdm_request hhdm_request;
 extern volatile struct limine_framebuffer_request framebuffer_request;
+
+#if defined(__x86_64__)
 extern volatile struct limine_rsdp_request rsdp_request;
+extern volatile struct limine_mp_request mp_request;
+#endif
 
 // =================
 

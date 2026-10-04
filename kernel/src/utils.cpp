@@ -43,10 +43,19 @@ volatile struct limine_framebuffer_request framebuffer_request =
 	.response = nullptr
 };
 
+#if defined(__x86_64__)
 __attribute__((used, section(".limine_requests")))
 volatile struct limine_rsdp_request rsdp_request =
 {
 	.id = LIMINE_RSDP_REQUEST_ID,
+	.revision = 0,
+	.response = nullptr
+};
+
+__attribute__((used, section(".limine_requests")))
+volatile struct limine_mp_request mp_request =
+{
+	.id = LIMINE_MP_REQUEST_ID,
 	.revision = 0,
 	.response = nullptr
 };
@@ -70,6 +79,7 @@ void* virt_to_phys(void* virt)
 {
 	return (void*)virt_to_phys((uintptr_t)virt);
 }
+#endif
 
 void hcf() {
     for (;;) {

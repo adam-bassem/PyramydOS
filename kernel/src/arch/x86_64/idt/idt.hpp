@@ -39,4 +39,7 @@ namespace arch::x86_64::idt
 	void init();
 
 	void set_handler(void* handler, uint8_t vector, uint8_t flags);
+
+	uint8_t allocate_entry();
+	void free_entry(uint8_t entry);
 }
