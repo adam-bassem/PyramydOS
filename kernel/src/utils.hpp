@@ -18,7 +18,6 @@ void* virt_to_phys(void* virt);
 
 void hcf();
 void pre_kernel();
-void hcf_g();
 
 // =================
 

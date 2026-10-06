@@ -221,7 +221,7 @@ void arch::x86_64::pmm::init()
 		break;
 	}
 
-	if (!pool_found) hcf_g();
+	if (!pool_found) hcf();
 
 	for (uint64_t i = 0; i < memmap_request.response->entry_count; i++)
 	{

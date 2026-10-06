@@ -49,7 +49,7 @@ namespace
 		uint8_t rsv2[200];
 		volatile uint64_t main_counter;
 		volatile uint64_t rsv3;
-		hpet_timer timers;
+		hpet_timer timers[];
 	};
 
 	hpet_regs* hpet_reg = nullptr;

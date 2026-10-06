@@ -59,7 +59,7 @@ extern "C" void high_level_exception_handler(int_context_t* ctx)
 	console::kprintf("error code = %llu (%llx)", ctx->error_code);
 	console::kprintf("cr0=%016llx cr2=%016llx cr3=%016llx cr3=%016llx", ctx->cr0, ctx->cr2, ctx->cr3, ctx->cr4);
 	
-	hcf_g();
+	hcf();
 }
 
 void arch::x86_64::idt::init()

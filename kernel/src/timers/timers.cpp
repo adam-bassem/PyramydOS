@@ -3,6 +3,8 @@
 #if defined(__x86_64__)
 #	include <arch/x86_64/timers/hpet.hpp>
 #endif
+#include <console/console.hpp>
+#include <interrupts/ints.hpp>
 
 void timers::init()
 {
@@ -57,4 +59,13 @@ uint64_t timers::total_elapsed()
 #endif
 
 	return 0;
+}
+
+#if defined(__x86_64__)
+extern "C" [[gnu::interrupt]]
+#endif
+void timer_periodic_interrupt(void*)
+{
+	console::kprintf("TIMER");
+	interrupts::send_eoi(0);
 }
