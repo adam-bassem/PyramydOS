@@ -66,6 +66,5 @@ extern "C" [[gnu::interrupt]]
 #endif
 void timer_periodic_interrupt(void*)
 {
-	console::kprintf("TIMER");
 	interrupts::send_eoi(0);
 }
