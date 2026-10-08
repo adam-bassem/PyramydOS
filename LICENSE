@@ -1,7 +1,7 @@
 Copyright © 2026 Adam Bassem and contributors. All rights reserved.
 
-Permission is granted to use, copy, modify, and redistribute PyramydOS and PyramydKernel,
-in whole or in part, including individual snippets, portions, files, and modified versions,
+Permission is granted to use, copy, modify, and redistribute PyramydOS in whole
+or in part, including individual snippets, portions, files, and modified versions,
 provided that clear and visible attribution to the original project is retained.
 
 For copied snippets or portions, the attribution must appear directly above or alongside
@@ -10,15 +10,10 @@ For the complete project or substantial portions of it, the attribution must be 
 in a clearly visible "ATTRIBUTION" file at the root of the project or workspace and must
 remain present in all redistributed versions.
 
-PyramydOS and PyramydKernel are two names for the same project and may be used
-interchangeably for attribution purposes.
-
 The attribution must include:
-"PyramydOS / PyramydKernel — Copyright © 2026 Adam Bassem and contributors. All rights reserved."
+"PyramydOS — Copyright © 2026 Adam Bassem and contributors. All rights reserved."
 and the official GitHub repository URL:
 https://github.com/adambassem256-crypto/PyramydOS
-
-You may attribute the project as PyramydOS, PyramydKernel, or both.
 
 This permission does not require the original project to remain unmodified and permits
 adaptation for distributions and other projects, provided that the required attribution

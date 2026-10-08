@@ -73,4 +73,4 @@ Thanks for taking a moment to check out my project!
 If you liked PyramydOS, don't forget to star the repository.
 Every star means a lot to me!
 
--- Adam Bassem and contributors.
+— Adam Bassem and contributors.

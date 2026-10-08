@@ -18,6 +18,7 @@
 #include <allocator/allocator.hpp>
 #include <timers/timers.hpp>
 #include <interrupts/ints.hpp>
+#include <vfs/vfs.hpp>
 
 extern "C" void kmain() {
     pre_kernel();
@@ -46,7 +47,7 @@ extern "C" void kmain() {
 	console::kprintf_nv("│|_|    \\__, |_|  \\__,_|_| |_| |_|\\__, |\\__,_|_|\\_\\___|_|  |_| |_|\\___|_|│");
 	console::kprintf_nv("│       |___/                     |___/                                  │");
 	console::kprintf_nv("└────────────────────────────────────────────────────────────────────────┘");
-	console::kprintf("Copyright © 2026 Adam Bassem. All rights reserved.");
+	console::kprintf("Copyright © 2026 Adam Bassem and contributors. All rights reserved.");
 
 #if defined(__x86_64__)
 	// RAM info
@@ -156,6 +157,22 @@ extern "C" void kmain() {
 
 	interrupts::enable_all();
 	console::kprintf("Enabled all interrupts...");
+
+	init_rand();
+	switch (rand_method())
+	{
+		case RAND_METHOD_RDRAND:
+			console::kprintf("Using rdrand instruction...");
+			break;
+		case RAND_METHOD_SPLITMIX64:
+			console::kprintf("Using SplitMix64");
+			break;
+	}
+
+	vfs::init();
+	vfs::list();
+	console::writes("\r\n");
+	console::kprintf("VFS Initialised...");
 
     hcf();
 }

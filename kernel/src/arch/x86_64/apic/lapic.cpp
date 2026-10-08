@@ -15,7 +15,7 @@
 #define IA32_APIC_BASE 0x1B
 #define X2APIC_MSR_BASE 0x800
 
-extern "C" [[gnu::interrupt]] void timer_periodic_interrupt(void*);
+extern "C" void timer_int();
 
 extern "C" [[gnu::interrupt]] void lapic_spurious_vector(void*)
 {
@@ -68,7 +68,7 @@ namespace arch::x86_64::lapic
 	void lapic::enable()
 	{
 		arch::x86_64::idt::set_handler((void*)lapic_spurious_vector, 0xFF, ENTRY_PRESENT | ENTRY_DPL0 | ENTRY_INTERRUPT_GATE);
-		arch::x86_64::idt::set_handler((void*)timer_periodic_interrupt, APIC_TIMER_VECTOR, ENTRY_PRESENT | ENTRY_DPL0 | ENTRY_INTERRUPT_GATE);
+		arch::x86_64::idt::set_handler((void*)timer_int, APIC_TIMER_VECTOR, ENTRY_PRESENT | ENTRY_DPL0 | ENTRY_INTERRUPT_GATE);
 
 		write(REG_TPR, 0);
 		write(REG_SPURIOUS, APIC_SOFTWARE_ENABLE | 0xFF);
