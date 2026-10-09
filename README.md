@@ -41,27 +41,6 @@ You need the following installed:
 - QEMU (x86_64)
 - Make
 
-### Project Structure
-
-```
-kernel/src/			Project root
-├── allocator			Growing heap allocator
-├── arch				Architecture-specific code
-│   └── x86_64				x86_64
-│       ├── acpi				ACPI code
-│       ├── apic				APIC code
-│       ├── gdt					GDT code
-│       ├── idt					IDT code
-│       ├── irq					IRQ code
-│       ├── mm					Memory management code
-│       └── timers				Timers code
-├── console				Console code
-├── ext					Extras
-│   └── flanterm			Flanterm
-├── interrupts			Interrupts code (cross-arch)
-└── timers				Timers code (cross-arch)
-```
-
 ### License
 
 Check the `LICENSE` file.

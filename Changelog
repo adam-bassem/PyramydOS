@@ -33,5 +33,6 @@
 	Added random numbers, UUID and UUID generator, and some string functions (2e1d19a)
 
 - Added Changelog
+- Removed project structure from README because I'm too lazy to update it everytime I add an update :)
 
 Latest version: Version 0.3.0
