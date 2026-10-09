@@ -157,5 +157,15 @@ extern "C" void kmain() {
 	interrupts::enable_all();
 	console::kprintf("Enabled all interrupts...");
 
+	init_rand();
+	char* method;
+	switch (rand_method())
+	{
+		case RAND_METHOD_RDRAND: method = "RDRAND"; break;
+		case RAND_METHOD_SPLITMIX64: method = "SplitMix64"; break;
+		default: method = "Unknown method..."; break;
+	}
+	console::kprintf("Initialised RNG... as %s", method);
+
     hcf();
 }

@@ -79,3 +79,34 @@ extern "C" {
 }
 
 // =================
+
+enum rmethod
+{
+	RAND_METHOD_RDRAND,
+	RAND_METHOD_SPLITMIX64,
+};
+
+void init_rand();
+uint64_t rand64();
+rmethod rand_method();
+
+// =================
+
+union UUID
+{
+	uint8_t bytes[16];
+	struct [[gnu::packed]]
+	{
+		uint64_t low;
+		uint64_t high;
+	};
+};
+
+UUID uuid_gen();
+void print_uuid(const UUID& uuid);
+
+// =================
+
+int strlen(const char* __restrict s);
+int strcmp(const char* s1, const char* s2);
+char* strtoks(char* str, const char* delms, char** save);
