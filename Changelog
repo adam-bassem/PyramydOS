@@ -1,0 +1,37 @@
+***************************
+*** PyramydOS Changelog ***
+***************************
+
+=====================================================
+
+=== UPDATE DATE DD/MM/YYYY - Version if applicable
+	Update Information (commit)
+
+- Extra notes if applicable
+
+=====================================================
+
+=== 9/10/2026
+	Revising all updates made to PyramydOS and creating a changelog starting from version 0.0.0 (Initial commit)
+
+- Initial Commit (98a6997), 2/10/2026, Version 0.0.0, Began project, features implemented:
+	- Console
+	- GDT
+	- IDT
+	- PMM
+	- VMM
+	- Allocator (growing-heap)
+	- ACPI
+	- HPET
+- Merge pull request #1 from adambassem256-crypto/feature/apic (5f15d8a), 4/10/2026, Version 0.1.0
+- APIC timer, and minor changes (31f24a4), 6/10/2026, Version 0.2.0
+- Fixed license (AGAIN) (e658d2f), 6/10/2026, Version 0.2.1
+- Updated README (d6a611f), 6/10/2026, Version 0.2.2
+
+
+=== 9/10/2026 - Version 0.3.0
+	Added random numbers, UUID and UUID generator, and some string functions (2e1d19a)
+
+- Added Changelog
+
+Latest version: Version 0.3.0
