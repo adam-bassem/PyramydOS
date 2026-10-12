@@ -38,3 +38,6 @@
 - Updated License to have the new username (adambassem256-crypto -> adam-bassem)
 
 Latest version: Version 0.3.0
+
+=== 12/10/2026 - Version 0.4.0
+	Removed flanterm, added custom terminal emulator and renderer

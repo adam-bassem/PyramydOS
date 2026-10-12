@@ -14,7 +14,8 @@ PyramydOS is a hobby operating system written primarily in C++, targeting x86_64
 - Physical Memory Manager (x86_64)
 - Virtual Memory Manager (x86_64)
 - Growing heap
-- Console (using Flanterm)
+- Custom terminal
+- Console
 - Custom ACPI implementation (x86_64)
 - HPET timer (x86_64)
 - APIC (x86_64)
@@ -22,6 +23,8 @@ PyramydOS is a hobby operating system written primarily in C++, targeting x86_64
 	- LAPIC
 	- x2APIC and xAPIC
 - LAPIC timer (x86_64)
+- Random numbers with RDRAND or SplitMix64
+- PCIe
 
 ### Building and running PyramydOS
 
