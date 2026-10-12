@@ -18,6 +18,7 @@
 #include <allocator/allocator.hpp>
 #include <timers/timers.hpp>
 #include <interrupts/ints.hpp>
+#include <pcie/pcie.hpp>
 
 extern "C" void kmain() {
     pre_kernel();
@@ -36,17 +37,16 @@ extern "C" void kmain() {
 	alloc::init(heap_base);
 
 	console::init();
-	console::swap_ctx(0);
 
-	console::kprintf_nv("┌────────────────────────────────────────────────────────────────────────┐");
-	console::kprintf_nv("│ ____                                      _ _  __                    _ │");
-	console::kprintf_nv("│|  _ \\ _   _ _ __ __ _ _ __ ___  _   _  __| | |/ /___ _ __ _ __   ___| |│");
-	console::kprintf_nv("│| |_) | | | | '__/ _` | '_ ` _ \\| | | |/ _` | ' // _ \\ '__| '_ \\ / _ \\ |│");
-	console::kprintf_nv("│|  __/| |_| | | | (_| | | | | | | |_| | (_| | . \\  __/ |  | | | |  __/ |│");
-	console::kprintf_nv("│|_|    \\__, |_|  \\__,_|_| |_| |_|\\__, |\\__,_|_|\\_\\___|_|  |_| |_|\\___|_|│");
-	console::kprintf_nv("│       |___/                     |___/                                  │");
-	console::kprintf_nv("└────────────────────────────────────────────────────────────────────────┘");
-	console::kprintf("Copyright © 2026 Adam Bassem. All rights reserved.");
+	console::kprintf("****************************************************************************");
+	console::kprintf("* ________                                         _______________________ *");
+	console::kprintf("* ___  __ \\____  ______________ _______ ________  _______  /_  __ \\_  ___/ *");
+	console::kprintf("* __  /_/ /_  / / /_  ___/  __ `/_  __ `__ \\_  / / /  __  /_  / / /____ \\  *");
+	console::kprintf("* _  ____/_  /_/ /_  /   / /_/ /_  / / / / /  /_/ // /_/ / / /_/ /____/ /  *");
+	console::kprintf("* /_/     _\\__, / /_/    \\__,_/ /_/ /_/ /_/_\\__, / \\__,_/  \\____/ /____/   *");
+	console::kprintf("*         /____/                           /____/                          *");
+	console::kprintf("****************************************************************************");
+	console::kprintf("Copyright \xa9 2026 Adam Bassem. All rights reserved.");
 
 #if defined(__x86_64__)
 	// RAM info
@@ -98,14 +98,14 @@ extern "C" void kmain() {
 	// System information
 	console::kprintf("Architecture: x86_64");
 
+	console::kprintf("Got %d framebuffer(s)", framebuffer_request.response->framebuffer_count);
+
 	console::kprintf(
 		"CPU: %s%s%s",
 		vendor,
 		has_brand ? " - " : "",
 		has_brand ? brand : ""
 	);
-
-	console::kprintf("PMM: %llu pages", ram_pages);
 
 	console::print_timestamp();
 	printf("RAM: %llu", ram_gib);
@@ -115,8 +115,6 @@ extern "C" void kmain() {
 
 	printf(" GiB\r\n" ANSI_RESET);
 #endif
-
-	console::kprintf("HHDM offset: 0x%llx", hhdm_request.response->offset);
 
 #if defined (__x86_64__)
 	console::kprintf("GDT Initialised...");
@@ -144,7 +142,7 @@ extern "C" void kmain() {
 
 	if ((total_seconds_uptime_end - total_seconds_uptime_begin) < test_duration_timer)
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "Timer misfunctioning");
+		console::kprintf(ANSI_BRIGHT_RED "Timer misfunctioning");
 		console::kprintf("Halting...");
 		hcf();
 	}
@@ -165,7 +163,10 @@ extern "C" void kmain() {
 		case RAND_METHOD_SPLITMIX64: method = "SplitMix64"; break;
 		default: method = "Unknown method..."; break;
 	}
-	console::kprintf("Initialised RNG... as %s", method);
+	console::kprintf("Initialised RNG as %s...", method);
+
+	pcie::init();
+	console::kprintf("Initialised PCIe");
 
     hcf();
 }

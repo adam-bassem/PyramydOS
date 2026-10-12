@@ -16,6 +16,15 @@
 #define ANSI_CYAN         "\033[36m"
 #define ANSI_WHITE        "\033[37m"
 
+#define ANSI_BRIGHT_BLACK	"\033[90m"
+#define ANSI_BRIGHT_RED		"\033[91m"
+#define ANSI_BRIGHT_GREEN	"\033[92m"
+#define ANSI_BRIGHT_YELLOW	"\033[93m"
+#define ANSI_BRIGHT_BLUE	"\033[94m"
+#define ANSI_BRIGHT_PURPLE	"\033[95m"
+#define ANSI_BRIGHT_CYAN	"\033[96m"
+#define ANSI_BRIGHT_WHITE	"\033[97m"
+
 #define ANSI_BG_BLACK     "\033[40m"
 #define ANSI_BG_RED       "\033[41m"
 #define ANSI_BG_GREEN     "\033[42m"
@@ -32,10 +41,7 @@ namespace console
 	void writes(const char* __restrict s);
 	void writec(const char c);	
 
-	void swap_ctx(size_t index);
-
 	int kprintf(const char* __restrict fmt, ...);
-	int kprintf_nv(const char* __restrict fmt, ...);
 	void print_timestamp();
 }
 

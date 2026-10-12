@@ -57,7 +57,7 @@ namespace
 		irq_entry* e = reinterpret_cast<irq_entry*>(alloc::malloc(sizeof(irq_entry)));
 		if (!e)
 		{
-			console::kprintf(ANSI_BOLD ANSI_RED "Out of memory... Failed to allocate IRQ entry");
+			console::kprintf(ANSI_BRIGHT_RED "Out of memory... Failed to allocate IRQ entry");
 			console::kprintf("Halting...");
 			hcf();
 		}

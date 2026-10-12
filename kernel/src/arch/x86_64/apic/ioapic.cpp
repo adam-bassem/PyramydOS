@@ -64,7 +64,7 @@ namespace
     {
     	if (!ioapic || !ioapic->base)
     	{
-    		console::kprintf(ANSI_BOLD ANSI_RED "Attempted to write to a " ANSI_BOLD ANSI_PURPLE "NULL" ANSI_BOLD ANSI_RED "I/O APIC");
+    		console::kprintf(ANSI_BRIGHT_RED "Attempted to write to a " ANSI_BRIGHT_PURPLE "NULL" ANSI_BRIGHT_RED "I/O APIC");
     		console::kprintf("Halting...");
     		hcf();
     	}
@@ -77,7 +77,7 @@ namespace
     {
    		if (!ioapic || !ioapic->base)
    		{
-   			console::kprintf(ANSI_BOLD ANSI_RED "Attempted to read to a " ANSI_BOLD ANSI_PURPLE "NULL" ANSI_BOLD ANSI_RED "I/O APIC");
+   			console::kprintf(ANSI_BRIGHT_RED "Attempted to read to a " ANSI_BRIGHT_PURPLE "NULL" ANSI_BRIGHT_RED "I/O APIC");
    			console::kprintf("Halting...");
    			hcf();
    		}
@@ -149,7 +149,7 @@ void arch::x86_64::ioapic::add_ioapic(void* address, uint32_t gsi_base)
 		last = reinterpret_cast<ioapic_entry*>(alloc::malloc(sizeof(ioapic_entry)));
 		if (!last)
 		{
-			console::kprintf(ANSI_BOLD ANSI_RED "Out of memory... Failed to allocate memory for first IOAPIC entry");
+			console::kprintf(ANSI_BRIGHT_RED "Out of memory... Failed to allocate memory for first IOAPIC entry");
 			console::kprintf("Halting...");
 			hcf();
 		}
@@ -159,7 +159,7 @@ void arch::x86_64::ioapic::add_ioapic(void* address, uint32_t gsi_base)
 	last->next = reinterpret_cast<ioapic_entry*>(alloc::malloc(sizeof(ioapic_entry)));
 	if (!last->next)
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "Out of memory... Failed to allocate memory for IOAPIC entry");
+		console::kprintf(ANSI_BRIGHT_RED "Out of memory... Failed to allocate memory for IOAPIC entry");
 		console::kprintf("Halting...");
 		hcf();
 	}
@@ -180,7 +180,7 @@ void arch::x86_64::ioapic::register_iso(uint8_t bus_src, uint8_t irq_src, uint32
     	last = reinterpret_cast<gsi2irq_mapping*>(alloc::malloc(sizeof(gsi2irq_mapping)));
     	if (!last)
     	{
-    		console::kprintf(ANSI_BOLD ANSI_RED "Out of memory... Failed to allocate memory for first GSI to IRQ mapping entry");
+    		console::kprintf(ANSI_BRIGHT_RED "Out of memory... Failed to allocate memory for first GSI to IRQ mapping entry");
     		console::kprintf("Halting...");
     		hcf();
     	}
@@ -190,7 +190,7 @@ void arch::x86_64::ioapic::register_iso(uint8_t bus_src, uint8_t irq_src, uint32
     last->next = reinterpret_cast<gsi2irq_mapping*>(alloc::malloc(sizeof(gsi2irq_mapping)));
     if (!last->next)
     {
-    	console::kprintf(ANSI_BOLD ANSI_RED "Out of memory... Failed to allocate memory for GSI to IRQ mapping entry");
+    	console::kprintf(ANSI_BRIGHT_RED "Out of memory... Failed to allocate memory for GSI to IRQ mapping entry");
     	console::kprintf("Halting...");
     	hcf();
     }
@@ -233,7 +233,7 @@ void arch::x86_64::ioapic::set_redir_entry(uint32_t gsi, uint8_t vector, bool ma
 		
 		ioapic = ioapic->next;
 	}
-	console::kprintf(ANSI_BOLD ANSI_RED "Failed to set redirection entry for GSI=%u...");
+	console::kprintf(ANSI_BRIGHT_RED "Failed to set redirection entry for GSI=%u...");
 	console::kprintf("Halting...");
 	hcf();
 

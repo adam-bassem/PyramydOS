@@ -123,7 +123,7 @@ void arch::x86_64::apic::init()
 	cpuid_result r = arch::x86_64::cpuid::cpuid(1, 0);
 	if (!(r.edx & (1ULL << 9)))
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "CPU does not support APIC!");
+		console::kprintf(ANSI_BRIGHT_RED "CPU does not support APIC!");
 		console::kprintf("Halting...");
 		hcf();
 	}
@@ -150,7 +150,7 @@ void arch::x86_64::apic::init()
 	madt = reinterpret_cast<madt_table*>(arch::x86_64::acpi::get_table("APIC"));
 	if (!madt)
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "Could not find MADT (\"APIC\") table...");
+		console::kprintf(ANSI_BRIGHT_RED "Could not find MADT (\"APIC\") table...");
 		console::kprintf("Halting...");
 		hcf();
 	}

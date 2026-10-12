@@ -65,7 +65,7 @@ void arch::x86_64::timers::hpet::init()
 	hpet_table* hpettable = reinterpret_cast<hpet_table*>(arch::x86_64::acpi::get_table("HPET"));
 	if (!hpettable)
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "HPET table not present");
+		console::kprintf(ANSI_BRIGHT_RED "HPET table not present");
 		console::kprintf("Halting...");
 		hcf();
 	}
@@ -80,12 +80,14 @@ void arch::x86_64::timers::hpet::init()
 
 	if (!hpet_reg)
 	{
-		console::kprintf(ANSI_BOLD ANSI_RED "Failed to allocate memory for HPET");
+		console::kprintf(ANSI_BRIGHT_RED "Failed to allocate memory for HPET");
 		console::kprintf("Halting...");
 		hcf();
 	}
 
 	hpet_reg->general_configs |= 0x01;
+
+	hpet_reg->main_counter = 0;
 
 	clk_period_fs = hpet_reg->general_cap >> 32;
 	clk_period_ns = clk_period_fs / 1000000ULL;
