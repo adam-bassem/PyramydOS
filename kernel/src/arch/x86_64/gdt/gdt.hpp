@@ -4,14 +4,13 @@
 
 namespace arch::x86_64::gdt
 {
-
 	struct [[gnu::packed]] gdtr
 	{
 		uint16_t limit;
 		uint64_t base;
 	};
 
-	struct [[gnu::packed]] tss
+	struct [[gnu::packed]] tss_struct
 	{
 		uint32_t reserved0;
 		uint64_t rsp[3];
@@ -22,8 +21,6 @@ namespace arch::x86_64::gdt
 		uint16_t iopb_offset;
 	};
 
-	static_assert(sizeof(tss) >= 104);
-
 	void init();
-
+	void set_rsp0(void* ptr);
 }

@@ -3,7 +3,7 @@
 namespace
 {
 
-	alignas(16) arch::x86_64::gdt::tss tss{};
+	alignas(16) arch::x86_64::gdt::tss_struct tss { };
 
 	constexpr uint64_t null_entry = 0x0000000000000000ULL;
 
@@ -30,7 +30,7 @@ namespace
 	void encode_tss()
 	{
 		const uint64_t base = reinterpret_cast<uint64_t>(&tss);
-		const uint64_t limit = sizeof(arch::x86_64::gdt::tss) - 1;
+		const uint64_t limit = sizeof(arch::x86_64::gdt::tss_struct) - 1;
 
 		constexpr uint8_t access = 0x89;
 		constexpr uint8_t flags = 0x00;
@@ -80,4 +80,9 @@ void arch::x86_64::gdt::init()
 		: "m" (gdtr_ptr), "r" (static_cast<uint16_t>(0x28))
 		: "rax", "memory"
 	);
+}
+
+void arch::x86_64::gdt::set_rsp0(void* ptr)
+{
+    tss.rsp[0] = (uint64_t)ptr;
 }

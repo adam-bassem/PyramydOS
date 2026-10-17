@@ -31,6 +31,10 @@ extern "C" void kmain() {
 	arch::x86_64::pmm::init();
 	arch::x86_64::vmm::init();
 
+	void* stack_base = arch::x86_64::vmm::alloc_pages(16);
+	arch::x86_64::gdt::set_rsp0(stack_base);
+	asm volatile("mov %0, %%rsp" : : "r"(stack_base) : "rsp");
+
 	heap_base = arch::x86_64::vmm::alloc_pages(1);
 #endif
 
@@ -137,7 +141,7 @@ extern "C" void kmain() {
 	uint64_t total_seconds_uptime_begin = timers::total_elapsed();
 
 	timers::sleep(test_duration_timer);
-	
+
 	uint64_t total_seconds_uptime_end = timers::total_elapsed();
 
 	if ((total_seconds_uptime_end - total_seconds_uptime_begin) < test_duration_timer)

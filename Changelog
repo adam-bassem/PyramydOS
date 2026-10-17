@@ -41,3 +41,8 @@ Latest version: Version 0.3.0
 
 === 12/10/2026 - Version 0.4.0
 	Removed flanterm, added custom terminal emulator and renderer
+
+=== 17/10/2026 - Version 0.5.0
+    Added PCIe, updated GDT(*)
+
+(*) -> Created set_rsp0 function to set kernel stack, in preparation to adding scheduler and syscalls
