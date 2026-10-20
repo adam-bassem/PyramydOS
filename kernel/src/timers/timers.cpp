@@ -17,7 +17,7 @@ void timers::sleep_us(uint64_t time_us)
 {
 #if defined(__x86_64__)
 	arch::x86_64::timers::hpet::sleep_us(time_us);
-#endif	
+#endif
 }
 
 void timers::sleep_ms(uint64_t time_ms)
@@ -66,5 +66,5 @@ extern "C" [[gnu::interrupt]]
 #endif
 void timer_periodic_interrupt(void*)
 {
-	interrupts::send_eoi(0);
+    interrupts::send_eoi(0);
 }
