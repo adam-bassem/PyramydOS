@@ -13,14 +13,15 @@ namespace
 
 void console::init()
 {
+	console::term::init(); // the terminal renderer stuff
 	console_initialised = true;
-	console::term::init();
 }
 
+// spoiler, i dont use this cute little fuck called writes at all, it just exists
 void console::writes(const char* __restrict s)
 {
 	if (!console_initialised) return;
-	
+
 	while (*s)
 	{
 		writec(*s);
@@ -28,13 +29,15 @@ void console::writes(const char* __restrict s)
 	}
 }
 
+// also this, i dont use this littler little fuck
 void console::writec(const char c)
 {
 	if (!console_initialised) return;
-	
+
 	console::term::putc(c);
 }
 
+// print timestamp and message, add newline and reset attributes like font or colour
 int console::kprintf(const char* __restrict fmt, ...)
 {
 	if (!console_initialised) return -1;
@@ -57,9 +60,10 @@ void console::print_timestamp()
 	uint64_t total_microsecs = timers::total_us_elapsed();
 	uint64_t secs = total_microsecs / 1000000;
 	uint64_t microsecs = total_microsecs % 1000000;
-	printf("[%llu.%06llu] ", secs, microsecs);	
+	printf("[%llu.%06llu] ", secs, microsecs);
 }
 
+// for printf
 void __putc__(char c)
 {
 	if (!console_initialised) return;

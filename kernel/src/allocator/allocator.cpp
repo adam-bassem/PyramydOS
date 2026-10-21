@@ -4,10 +4,8 @@
 #include <cstdint>
 #include <cstddef>
 
-#if defined (__x86_64__)
-#	include <arch/x86_64/mm/vmm.hpp>
-#	include <arch/x86_64/mm/pmm.hpp>
-#endif
+#include <arch/x86_64/mm/vmm.hpp>
+#include <arch/x86_64/mm/pmm.hpp>
 
 namespace
 {
@@ -66,7 +64,6 @@ namespace
 
 	void* arch_map_pages(uint64_t virt, size_t pages)
 	{
-#if defined (__x86_64__)
 		void* phys = arch::x86_64::pmm::alloc_pages(pages);
 		if (!phys) return nullptr;
 
@@ -74,9 +71,6 @@ namespace
 			return nullptr;
 
 		return reinterpret_cast<void*>(virt);
-#else
-		return nullptr;
-#endif
 	}
 
 	bool grow_heap(size_t min_bytes)
@@ -122,10 +116,10 @@ namespace
 	}
 }
 
-void alloc::init(void* base)
+void alloc::init(void* base, size_t allocated_pages)
 {
-	heap_cursor = (uint64_t)base;
-	grow_heap(region_grow_pages * page_size);
+	heap_cursor = reinterpret_cast<uint64_t>(base) + allocated_pages * page_size;
+	free_head = nullptr;
 }
 
 void* alloc::malloc(size_t size)

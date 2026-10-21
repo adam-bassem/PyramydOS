@@ -14,7 +14,7 @@ namespace
 		uint8_t reserved;
 		uint64_t address;
 	};
-	
+
 	struct [[gnu::packed]] hpet_table
 	{
 		acpi_sdt_header header;
@@ -30,7 +30,7 @@ namespace
 		uint16_t minimum_tick;
 		uint8_t page_protection;
 	};
-	
+
 	struct hpet_timer
 	{
 		volatile uint64_t config;
@@ -38,7 +38,7 @@ namespace
 		volatile uint64_t fsb_int;
 		volatile uint64_t rsv;
 	};
-	
+
 	struct hpet_regs
 	{
 		volatile uint64_t general_cap;
@@ -49,7 +49,7 @@ namespace
 		uint8_t rsv2[200];
 		volatile uint64_t main_counter;
 		volatile uint64_t rsv3;
-		hpet_timer timers[];
+		hpet_timer timers[]; // flexible array
 	};
 
 	hpet_regs* hpet_reg = nullptr;
@@ -62,6 +62,7 @@ namespace
 
 void arch::x86_64::timers::hpet::init()
 {
+    // get HPET table
 	hpet_table* hpettable = reinterpret_cast<hpet_table*>(arch::x86_64::acpi::get_table("HPET"));
 	if (!hpettable)
 	{
@@ -70,11 +71,11 @@ void arch::x86_64::timers::hpet::init()
 		hcf();
 	}
 	uintptr_t phys_addr = hpettable->address.address;
-	
+
 	hpet_reg = reinterpret_cast<hpet_regs*>(arch::x86_64::vmm::mmap(
-		reinterpret_cast<void*>(phys_addr), 
-		reinterpret_cast<void*>(phys_to_virt(phys_addr)), 
-		PTE_PRESENT | PTE_WRITABLE, 
+		reinterpret_cast<void*>(phys_addr),
+		reinterpret_cast<void*>(phys_to_virt(phys_addr)),
+		PTE_PRESENT | PTE_WRITABLE,
 		1
 	));
 
@@ -85,10 +86,11 @@ void arch::x86_64::timers::hpet::init()
 		hcf();
 	}
 
+	// enable HPET
 	hpet_reg->general_configs |= 0x01;
+	hpet_reg->main_counter = 0; // reset counter so elapsed time counts starting from HPEt initialisation
 
-	hpet_reg->main_counter = 0;
-
+	// period lengths
 	clk_period_fs = hpet_reg->general_cap >> 32;
 	clk_period_ns = clk_period_fs / 1000000ULL;
 	initialised = true;
@@ -97,7 +99,7 @@ void arch::x86_64::timers::hpet::init()
 void arch::x86_64::timers::hpet::sleep_us(uint64_t us_time)
 {
 	if (!initialised) return;
-	
+
 	uint64_t target_fs = us_time * 1000000000ULL;
 	uint64_t ticks_to_wait = target_fs / clk_period_fs;
 	uint64_t start_tick = hpet_reg->main_counter;

@@ -5,9 +5,9 @@
 
 namespace
 {
-	bool int_set[NUM_INTS] = { false };
-	bool int_alloc[NUM_INTS] = { false };
-	arch::x86_64::idt::idt_entry idt_entries[NUM_INTS] = { 0 };
+	bool int_set[num_ints] = { false };
+	bool int_alloc[num_ints] = { false };
+	arch::x86_64::idt::idt_entry idt_entries[num_ints] = { 0 };
 
 	const char* exception_names[] =
 	{
@@ -42,6 +42,7 @@ namespace
 	};
 }
 
+// called from idt.asm exception stuff
 extern "C" void high_level_exception_handler(int_context_t* ctx)
 {
 	console::kprintf("*******************************");
@@ -58,7 +59,7 @@ extern "C" void high_level_exception_handler(int_context_t* ctx)
 	console::kprintf("ss=%016llx", ctx->ss);
 	console::kprintf("error code = %llu (%llx)", ctx->error_code);
 	console::kprintf("cr0=%016llx cr2=%016llx cr3=%016llx cr3=%016llx", ctx->cr0, ctx->cr2, ctx->cr3, ctx->cr4);
-	
+
 	hcf();
 }
 
@@ -73,29 +74,30 @@ void arch::x86_64::idt::init()
 	auto setex =
 	[&](bool err, uint8_t vec, uint8_t type)
 	{
-		set_handler(exception_stub_table[vec], vec, type | ENTRY_DPL0 | ENTRY_PRESENT);
+		set_handler(exception_stub_table[vec], vec, type | idt_entry_dpl0 | idt_entry_present);
 	};
 
-	setex(false, 0, ENTRY_INTERRUPT_GATE);
-	setex(false, 1, ENTRY_INTERRUPT_GATE);
-	setex(false, 2, ENTRY_INTERRUPT_GATE);
-	setex(false, 3, ENTRY_TRAP_GATE);
-	setex(false, 4, ENTRY_TRAP_GATE);
-	setex(false, 5, ENTRY_INTERRUPT_GATE);
-	setex(false, 6, ENTRY_INTERRUPT_GATE);
-	setex(false, 7, ENTRY_INTERRUPT_GATE);
-	setex(true, 8, ENTRY_INTERRUPT_GATE);
-	setex(true, 10, ENTRY_INTERRUPT_GATE);
-	setex(true, 11, ENTRY_INTERRUPT_GATE);
-	setex(true, 12, ENTRY_INTERRUPT_GATE);
-	setex(true, 13, ENTRY_INTERRUPT_GATE);
-	setex(true, 14, ENTRY_INTERRUPT_GATE);
-	setex(false, 16, ENTRY_INTERRUPT_GATE);
-	setex(true, 17, ENTRY_INTERRUPT_GATE);
-	setex(false, 18, ENTRY_INTERRUPT_GATE);
-	setex(false, 19, ENTRY_INTERRUPT_GATE);
-	setex(false, 20, ENTRY_INTERRUPT_GATE);
-	setex(true, 21, ENTRY_INTERRUPT_GATE);
+	// i know your eyes hurt, mine too
+	setex(false, 0, idt_entry_interrupt_gate);
+	setex(false, 1, idt_entry_interrupt_gate);
+	setex(false, 2, idt_entry_interrupt_gate);
+	setex(false, 3, idt_entry_trap_gate);
+	setex(false, 4, idt_entry_trap_gate);
+	setex(false, 5, idt_entry_interrupt_gate);
+	setex(false, 6, idt_entry_interrupt_gate);
+	setex(false, 7, idt_entry_interrupt_gate);
+	setex(true, 8, idt_entry_interrupt_gate);
+	setex(true, 10, idt_entry_interrupt_gate);
+	setex(true, 11, idt_entry_interrupt_gate);
+	setex(true, 12, idt_entry_interrupt_gate);
+	setex(true, 13, idt_entry_interrupt_gate);
+	setex(true, 14, idt_entry_interrupt_gate);
+	setex(false, 16, idt_entry_interrupt_gate);
+	setex(true, 17, idt_entry_interrupt_gate);
+	setex(false, 18, idt_entry_interrupt_gate);
+	setex(false, 19, idt_entry_interrupt_gate);
+	setex(false, 20, idt_entry_interrupt_gate);
+	setex(true, 21, idt_entry_interrupt_gate);
 
 	asm volatile
 	(

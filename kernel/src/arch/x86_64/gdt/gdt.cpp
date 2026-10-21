@@ -35,6 +35,7 @@ namespace
 		constexpr uint8_t access = 0x89;
 		constexpr uint8_t flags = 0x00;
 
+		// scary
 		tss_low =
 			(limit & 0xFFFFULL)
 			| ((base & 0xFFFFFFULL) << 16)
@@ -61,6 +62,7 @@ void arch::x86_64::gdt::init()
 		.base  = reinterpret_cast<uint64_t>(&gdt_entries)
 	};
 
+	// get that gdt workin'
 	asm volatile
 	(
 		"lgdt %0\n"

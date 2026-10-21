@@ -46,3 +46,14 @@ Latest version: Version 0.3.0
     Added PCIe, updated GDT(*)
 
 (*) -> Created set_rsp0 function to set kernel stack, in preparation to adding scheduler and syscalls
+
+=== 21/10/2026 - Version 0.5.1
+    Clean up code, remove architecture abstraction
+
+--- Notes
+- Removed "#if defined(__x86_64__)" since I'm not planning on supporting any other architecture
+- Cleaned up some stuff
+- Replaced #define with constexpr
+- Made APIC timer fire at 10hz frequency instead of the old 1000hz
+- Minor change in ACPI (check if reported RSDP table length is smaller than struct size)
+- Added some comments

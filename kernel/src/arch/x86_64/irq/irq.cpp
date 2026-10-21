@@ -102,6 +102,7 @@ void arch::x86_64::irq::set_irq(uint32_t irq, void* handler)
 {
 	console::kprintf("set_irq: irq=%u", irq);
 
+	// allocate a free IDT entry for the IRQ
 	uint8_t entry = arch::x86_64::idt::allocate_entry();
 	console::kprintf("set_irq: vector=%u", entry);
 
@@ -113,7 +114,7 @@ void arch::x86_64::irq::set_irq(uint32_t irq, void* handler)
 
 	push_irq_entry(e);
 
-	arch::x86_64::idt::set_handler(handler, e.idt_entry, ENTRY_PRESENT | ENTRY_DPL0 | ENTRY_INTERRUPT_GATE);
+	arch::x86_64::idt::set_handler(handler, e.idt_entry, idt_entry_present | idt_entry_dpl0 | idt_entry_interrupt_gate);
 	arch::x86_64::ioapic::set_redir_entry(e.gsi, e.idt_entry, true);
 }
 

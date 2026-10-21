@@ -3,19 +3,19 @@
 #include <utils.hpp>
 #include <cstdint>
 
-#define ENTRY_PRESENT        (uint8_t)(1 << 7)
+constexpr uint8_t idt_entry_present = 1 << 7;
 
-#define ENTRY_DPL0           (uint8_t)(0 << 5)
-#define ENTRY_DPL1           (uint8_t)(1 << 5)
-#define ENTRY_DPL2           (uint8_t)(2 << 5)
-#define ENTRY_DPL3           (uint8_t)(3 << 5)
+constexpr uint8_t idt_entry_dpl0 = 0 << 5;
+constexpr uint8_t idt_entry_dpl1 = 1 << 5;
+constexpr uint8_t idt_entry_dpl2 = 2 << 5;
+constexpr uint8_t idt_entry_dpl3 = 3 << 5;
 
-#define ENTRY_INTERRUPT_GATE (uint8_t)0xE
-#define ENTRY_TRAP_GATE      (uint8_t)0xF
+constexpr uint8_t idt_entry_interrupt_gate = 0xE;
+constexpr uint8_t idt_entry_trap_gate = 0xF;
 
-#define NUM_INTS 256
+constexpr uint32_t num_ints = 256;
 
-extern "C" void* exception_stub_table[22];
+extern "C" void* exception_stub_table[32];
 
 namespace arch::x86_64::idt
 {

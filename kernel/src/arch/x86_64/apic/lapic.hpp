@@ -2,38 +2,36 @@
 
 #include <stdint.h>
 
-#define REG_ID                  0x020
-#define REG_VERSION             0x030
-#define REG_TPR                 0x080
-#define REG_APR                 0x090
-#define REG_PPR                 0x0A0
-#define REG_EOI                 0x0B0
-#define REG_RRD                 0x0C0
-#define REG_LOGICAL_DEST        0x0D0
-#define REG_DEST_FORMAT         0x0E0
-#define REG_SPURIOUS            0x0F0
+constexpr uint32_t reg_id = 0x020;
+constexpr uint32_t reg_version = 0x030;
+constexpr uint32_t reg_tpr = 0x080;
+constexpr uint32_t reg_apr = 0x090;
+constexpr uint32_t reg_ppr = 0x0A0;
+constexpr uint32_t reg_eoi = 0x0B0;
+constexpr uint32_t reg_rrd = 0x0C0;
+constexpr uint32_t reg_logical_dest = 0x0D0;
+constexpr uint32_t reg_dest_format = 0x0E0;
+constexpr uint32_t reg_spurious = 0x0F0;
 
-#define REG_ISR                 0x100
-#define REG_TMR                 0x180
-#define REG_IRR                 0x200
+constexpr uint32_t reg_isr = 0x100;
+constexpr uint32_t reg_tmr = 0x180;
+constexpr uint32_t reg_irr = 0x200;
 
-#define REG_ERROR_STATUS        0x280
+constexpr uint32_t reg_error_status = 0x280;
 
-#define REG_ICR_LOW             0x300
-#define REG_ICR_HIGH            0x310
+constexpr uint32_t reg_icr_low = 0x300;
+constexpr uint32_t reg_icr_high = 0x310;
 
-#define REG_LVT_TIMER           0x320
-#define REG_LVT_THERMAL         0x330
-#define REG_LVT_PERFORMANCE     0x340
-#define REG_LVT_LINT0           0x350
-#define REG_LVT_LINT1           0x360
-#define REG_LVT_ERROR           0x370
+constexpr uint32_t reg_lvt_timer = 0x320;
+constexpr uint32_t reg_lvt_thermal = 0x330;
+constexpr uint32_t reg_lvt_performance = 0x340;
+constexpr uint32_t reg_lvt_lint0 = 0x350;
+constexpr uint32_t reg_lvt_lint1 = 0x360;
+constexpr uint32_t reg_lvt_error = 0x370;
 
-#define REG_TIMER_INITIAL_COUNT 0x380
-#define REG_TIMER_CURRENT_COUNT 0x390
-#define REG_TIMER_DIVIDE        0x3E0
-
-#define MSR_BASE 0x800
+constexpr uint32_t reg_timer_initial_count = 0x380;
+constexpr uint32_t reg_timer_current_count = 0x390;
+constexpr uint32_t reg_timer_divide = 0x3E0;
 
 namespace arch::x86_64::lapic
 {

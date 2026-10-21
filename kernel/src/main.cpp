@@ -1,47 +1,46 @@
+#include <arch/x86_64/gdt/gdt.hpp>
+#include <arch/x86_64/idt/idt.hpp>
+#include <arch/x86_64/mm/pmm.hpp>
+#include <arch/x86_64/mm/vmm.hpp>
+#include	<arch/x86_64/acpi/acpi.hpp>
+#include <arch/x86_64/io.hpp>
+#include <arch/x86_64/cpuid.hpp>
+#include <arch/x86_64/apic/apic.hpp>
+#include <arch/x86_64/apic/ioapic.hpp>
+#include <arch/x86_64/apic/lapic.hpp>
+#include <arch/x86_64/irq/irq.hpp>
+
 #include "utils.hpp"
-
-#if defined (__x86_64__)
-#	include <arch/x86_64/gdt/gdt.hpp>
-#	include <arch/x86_64/idt/idt.hpp>
-#	include <arch/x86_64/mm/pmm.hpp>
-#	include <arch/x86_64/mm/vmm.hpp>
-#	include	<arch/x86_64/acpi/acpi.hpp>
-#	include <arch/x86_64/io.hpp>
-#	include <arch/x86_64/cpuid.hpp>
-#	include <arch/x86_64/apic/apic.hpp>
-#	include <arch/x86_64/apic/ioapic.hpp>
-#	include <arch/x86_64/apic/lapic.hpp>
-#	include <arch/x86_64/irq/irq.hpp>
-#endif
-
 #include <console/console.hpp>
 #include <allocator/allocator.hpp>
 #include <timers/timers.hpp>
 #include <interrupts/ints.hpp>
 #include <pcie/pcie.hpp>
 
+// Kernel starts here
 extern "C" void kmain() {
-    pre_kernel();
+    pre_kernel(); // some weird stuff i literally forgot what they were
 
 	void* heap_base;
 
-#if defined (__x86_64__)
 	arch::x86_64::gdt::init();
 	arch::x86_64::idt::init();
 	arch::x86_64::pmm::init();
 	arch::x86_64::vmm::init();
 
+	// allocate 64KiB for stack and put it in rsp0 in the TSS
 	void* stack_base = arch::x86_64::vmm::alloc_pages(16);
 	arch::x86_64::gdt::set_rsp0(stack_base);
 	asm volatile("mov %0, %%rsp" : : "r"(stack_base) : "rsp");
 
+	// just allocate one page the heap grows anyway
 	heap_base = arch::x86_64::vmm::alloc_pages(1);
-#endif
+    alloc::init(heap_base, 1);
 
-	alloc::init(heap_base);
-
+    // get text printin'
 	console::init();
 
+	// some fancy shit
 	console::kprintf("****************************************************************************");
 	console::kprintf("* ________                                         _______________________ *");
 	console::kprintf("* ___  __ \\____  ______________ _______ ________  _______  /_  __ \\_  ___/ *");
@@ -52,7 +51,7 @@ extern "C" void kmain() {
 	console::kprintf("****************************************************************************");
 	console::kprintf("Copyright \xa9 2026 Adam Bassem. All rights reserved.");
 
-#if defined(__x86_64__)
+	// some hardware shit cuz why not?
 	// RAM info
 	uint64_t ram_pages = arch::x86_64::pmm::total_pages_count();
 	uint64_t ram_bytes = ram_pages * 0x1000ULL;
@@ -118,25 +117,25 @@ extern "C" void kmain() {
 		printf(".%u", (uint32_t)ram_decimal);
 
 	printf(" GiB\r\n" ANSI_RESET);
-#endif
 
-#if defined (__x86_64__)
+    // printed late because console wasn't initialised
 	console::kprintf("GDT Initialised...");
 	console::kprintf("IDT Initialised...");
 	console::kprintf("Physical Memory Manager Initialised...");
 	console::kprintf("Virtual Memory Manager Initialised...");
-#endif
 
 	console::kprintf("Allocator Initialised...");
 
-#if defined (__x86_64__)
+	// acpi you evil piece of shit
 	arch::x86_64::acpi::init();
 	console::kprintf("ACPI Initialised...");
-#endif
 
 	timers::init();
 	console::kprintf("Timers Initialised...");
 
+	// sleeping just for the reason of allowing the user to take a look at the beautiful ascii art,
+	// and covering up the crime with the idea of "checking if sleep works" when it will always be
+	// working because elapsed uses the same counter as sleep :)
 	constexpr uint64_t test_duration_timer = 3;
 	uint64_t total_seconds_uptime_begin = timers::total_elapsed();
 
@@ -146,19 +145,19 @@ extern "C" void kmain() {
 
 	if ((total_seconds_uptime_end - total_seconds_uptime_begin) < test_duration_timer)
 	{
-		console::kprintf(ANSI_BRIGHT_RED "Timer misfunctioning");
+		console::kprintf(ANSI_BRIGHT_RED "Timer misfunctioning"); // no its not idiot
 		console::kprintf("Halting...");
 		hcf();
 	}
 
-#if defined (__x86_64__)
+	// writing the apic literally violates geneva convention
 	arch::x86_64::apic::init();
 	console::kprintf("APIC Initialised...");
-#endif
 
 	interrupts::enable_all();
 	console::kprintf("Enabled all interrupts...");
 
+	// random numbers go vroom
 	init_rand();
 	char* method;
 	switch (rand_method())
@@ -172,5 +171,5 @@ extern "C" void kmain() {
 	pcie::init();
 	console::kprintf("Initialised PCIe");
 
-    hcf();
+    hcf(); // How Did We Get Here?
 }

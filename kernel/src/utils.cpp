@@ -1,8 +1,5 @@
 #include "utils.hpp"
-
-#if defined(__x86_64__)
-#	include <arch/x86_64/cpuid.hpp>
-#endif
+#include <arch/x86_64/cpuid.hpp>
 #include <timers/timers.hpp>
 #include <console/console.hpp>
 
@@ -43,7 +40,6 @@ volatile struct limine_framebuffer_request framebuffer_request =
 	.response = nullptr
 };
 
-#if defined(__x86_64__)
 __attribute__((used, section(".limine_requests")))
 volatile struct limine_rsdp_request rsdp_request =
 {
@@ -65,7 +61,6 @@ namespace
 {
 	bool has_rdrand = false;
 	bool has_rdseed = false;
-#endif
 
 	uint64_t state = 0;
 
@@ -89,7 +84,6 @@ namespace
 	}
 }
 
-#if defined(__x86_64__)
 uintptr_t phys_to_virt(uintptr_t phys)
 {
 	return phys <= 0x00007FFFFFFFFFFF ? phys + 0xFFFF800000000000 : phys;
@@ -109,7 +103,6 @@ void* virt_to_phys(void* virt)
 {
 	return (void*)virt_to_phys((uintptr_t)virt);
 }
-#endif
 
 void hcf()
 {
@@ -138,6 +131,7 @@ extern "C"
 extern void (*__init_array[])();
 extern void (*__init_array_end[])();
 
+// whatever this does, sure
 void pre_kernel()
 {
 	if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == false)
@@ -160,7 +154,6 @@ void pre_kernel()
 
 void init_rand()
 {
-#if defined(__x86_64__)
 	cpuid_result r = arch::x86_64::cpuid::cpuid(0, 0);
 	uint32_t max_leaf = r.eax;
 
@@ -183,10 +176,8 @@ void init_rand()
 		if (has_rdseed)
 			console::kprintf("RDSEED supported");
 	}
-#endif
 }
 
-#if defined(__x86_64__)
 bool rdseed64(uint64_t* out)
 {
 	uint8_t success;
@@ -200,11 +191,9 @@ bool rdrand64(uint64_t* out)
 	asm volatile("rdrand %0; setc %1" : "=r"(*out), "=qm"(success) : : "cc");
 	return success;
 }
-#endif
 
 uint64_t rand64()
 {
-#if defined(__x86_64__)
 	uint64_t value;
 
 	if (has_rdseed)
@@ -224,7 +213,6 @@ uint64_t rand64()
 				return value;
 		}
 	}
-#endif
 
 	return time_rand();
 }
@@ -309,7 +297,7 @@ char* strtoks(char* str, const char* delms, char** save)
 	{
 		str = *save;
 	}
-	
+
 	if (!str)
 	{
 		return nullptr;

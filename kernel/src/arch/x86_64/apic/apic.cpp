@@ -120,6 +120,7 @@ namespace
 
 void arch::x86_64::apic::init()
 {
+    // check that we have APIC supported
 	cpuid_result r = arch::x86_64::cpuid::cpuid(1, 0);
 	if (!(r.edx & (1ULL << 9)))
 	{
@@ -129,24 +130,31 @@ void arch::x86_64::apic::init()
 	}
 	console::kprintf("APIC supported");
 
+	// check if we have x2APIC
 	r = arch::x86_64::cpuid::cpuid(1, 0);
 	x2apic = r.ecx & (1ULL << 21);
-	if (x2apic) console::kprintf("x2APIC supported");
+	if (x2apic)
+	{
+	    console::kprintf("x2APIC supported");
+	}
 
 	uint64_t apic_base = arch::x86_64::msr::read(IA32_APIC_BASE);
 
 	apic_base |= APIC_ENABLE;
-	
+
+	// enable x2APIC
 	if (x2apic)
 	{
 		apic_base |= X2APIC_ENABLE;
 	}
-	
+
 	arch::x86_64::msr::write(IA32_APIC_BASE, apic_base);
 
+	// disable PIC completely
 	arch::x86_64::io::outb(0x21, 0xFF);
 	arch::x86_64::io::outb(0xA1, 0xFF);
 
+	// get MADT
 	madt = reinterpret_cast<madt_table*>(arch::x86_64::acpi::get_table("APIC"));
 	if (!madt)
 	{
@@ -156,6 +164,7 @@ void arch::x86_64::apic::init()
 	}
 	console::kprintf("Acquired MADT table from ACPI");
 
+	// too lazy to check BSP lapic with other methods, limine just gives it to me to why not?
 	lapic_bsp = mp_request.response->bsp_lapic_id;
 	console::kprintf("Acquired BSP LAPIC ID: 0x%x", lapic_bsp);
 	lapic_address = reinterpret_cast<void*>(madt->lapic_address);
@@ -163,6 +172,7 @@ void arch::x86_64::apic::init()
 	uint64_t cursor = reinterpret_cast<uint64_t>(reinterpret_cast<uint64_t>(madt) + sizeof(madt_table));
 	uint64_t end = reinterpret_cast<uint64_t>(reinterpret_cast<uint64_t>(madt) + madt->header.length);
 
+	// check all madt entries and record them
 	while (cursor < end)
 	{
 		madt_entry* entry = reinterpret_cast<madt_entry*>(cursor);
@@ -176,7 +186,7 @@ void arch::x86_64::apic::init()
 					ANSI_GREEN "\tACPI Processor ID:" ANSI_CYAN " %u\t" ANSI_GREEN "APIC ID:" ANSI_CYAN " %u\t" ANSI_GREEN "Flags:" ANSI_CYAN " 0x%x",
 					entry->processor_lapic.acpi_processor_id, entry->processor_lapic.apic_id, entry->processor_lapic.flags
 				);
-			
+
 				break;
 			}
 
@@ -189,7 +199,7 @@ void arch::x86_64::apic::init()
 				);
 
                 arch::x86_64::ioapic::add_ioapic((void*)entry->ioapic.ioapic_address, entry->ioapic.gsi_base);
-			
+
 				break;
 			}
 
@@ -197,7 +207,7 @@ void arch::x86_64::apic::init()
 			{
 				console::kprintf("Found I/O APIC Interrupt Source Override entry:");
 				console::kprintf(ANSI_GREEN "\t" ANSI_GREEN "Bus Source:" ANSI_CYAN " %u\t" ANSI_GREEN "IRQ Source:" ANSI_CYAN " %u\t" ANSI_GREEN "GSI:" ANSI_CYAN " %u\t" ANSI_GREEN "Flags:" ANSI_CYAN " 0x%x", entry->ioapic_iso.bus_source, entry->ioapic_iso.irq_source, entry->ioapic_iso.gsi, entry->ioapic_iso.flags);
-			
+
                 arch::x86_64::ioapic::register_iso(entry->ioapic_iso.bus_source, entry->ioapic_iso.irq_source, entry->ioapic_iso.gsi);
 
 				break;
@@ -207,7 +217,7 @@ void arch::x86_64::apic::init()
 			{
 				console::kprintf("Found I/O APIC Non-Maskable Interrupt Source entry:");
 				console::kprintf(ANSI_GREEN "\tNMI Source:" ANSI_CYAN " %u\t" ANSI_GREEN "Flags:" ANSI_CYAN " 0x%x\t" ANSI_GREEN "GSI:" ANSI_CYAN " %u", entry->ioapic_nmi_int_src.nmi_source, entry->ioapic_nmi_int_src.flags, entry->ioapic_nmi_int_src.gsi);
-			
+
 				break;
 			}
 
@@ -215,7 +225,7 @@ void arch::x86_64::apic::init()
 			{
 				console::kprintf("Found Local APIC Non-Maskable Interrupts entry:");
 				console::kprintf(ANSI_GREEN "\tACPI Processor ID:" ANSI_CYAN " 0x%x\t" ANSI_GREEN "Flags:" ANSI_CYAN " 0x%x\t" ANSI_GREEN "LINT#:" ANSI_CYAN " %u", entry->lapic_nmi.acpi_processor_id, entry->lapic_nmi.flags, entry->lapic_nmi.lintx);
-			
+
 				break;
 			}
 
@@ -224,7 +234,7 @@ void arch::x86_64::apic::init()
 				console::kprintf("Found Local APIC Address Override entry:");
 				console::kprintf(ANSI_GREEN "\tLAPIC Address:" ANSI_CYAN " 0x%p", entry->lapic_address_override.lapic_address);
 				lapic_address = reinterpret_cast<void*>(entry->lapic_address_override.lapic_address);
-			
+
 				break;
 			}
 
@@ -232,7 +242,7 @@ void arch::x86_64::apic::init()
 			{
 				console::kprintf("Found Processor Local x2APIC entry:");
 				console::kprintf(ANSI_GREEN "\tProcessor Local x2APIC ID:" ANSI_CYAN " %u\t" ANSI_GREEN "Flags:" ANSI_CYAN " 0x%x\t" ANSI_GREEN "ACPI ID:" ANSI_CYAN " %u", entry->processor_local_x2apic.processor_local_x2apic_id, entry->processor_local_x2apic.flags, entry->processor_local_x2apic.acpi_id);
-			
+
 				break;
 			}
 		}
@@ -240,6 +250,7 @@ void arch::x86_64::apic::init()
 		cursor += entry->record_length;
 	}
 
+	// initialise BSP lapic
 	void* lapic_addr_virt = arch::x86_64::vmm::alloc_pages(1);
 	arch::x86_64::vmm::mmap(lapic_address, lapic_addr_virt, PTE_PRESENT | PTE_WRITABLE, 1);
 

@@ -10,7 +10,7 @@ namespace interrupts
 	void clear_irq(uint32_t irq);
 	void mask_irq(uint32_t irq);
 	void unmask_irq(uint32_t irq);
-	void send_eoi(uint32_t irq);
+	void send_eoi();
 	void enable_all();
 	void disable_all();
 }
